@@ -2,78 +2,80 @@
 #include "VectorMaths.h"
 #include "Mesh.h"
 
+#define TARGET_FRAMERATE 50
 #define NEAR 0.01f
 #define FAR 100.0f
 #define DEG_2_RAD 0.01745329f
 #define FOV_RADIANS (60.0f * DEG_2_RAD)
 
 class RenderedObject {
-  Mesh* mesh;  
-  Matrix4f transformMatrix;
+    Mesh* mesh;
+    Matrix4f transformMatrix;
 
-  bool updated = true;
+    bool updated = true;
 
   public:
-  Vector3f position;
-  Vector3f rotation;
-  
-  RenderedObject(Vector3f _position, Vector3f _rotation, Mesh* _mesh) {
-    position = _position;
-    rotation = _rotation;
-    mesh = _mesh;
-  }
+    Vector3f position;
+    Vector3f rotation;
 
-  void markUpdated() {
-    updated = true;
-  }
-
-  void onPreRender() {
-    if (updated) {
-      updateTransformMatrix();
-      updated = false;
+    RenderedObject(Vector3f _position, Vector3f _rotation, Mesh* _mesh) {
+      position = _position;
+      rotation = _rotation;
+      mesh = _mesh;
     }
-  }
 
-  const Matrix4f& TransformMatrix() {
-    return transformMatrix;
-  }
+    void markUpdated() {
+      updated = true;
+    }
 
-  const Mesh* Mesh() {
-    return mesh;
-  }
+    void onPreRender() {
+      if (updated) {
+        updateTransformMatrix();
+        updated = false;
+      }
+    }
+
+    const Matrix4f& TransformMatrix() {
+      return transformMatrix;
+    }
+
+    const Mesh* Mesh() {
+      return mesh;
+    }
 
   private:
-  void updateTransformMatrix() {
-    transformMatrix = {
-      1.0f, 0.0f, 0.0f, position.x,
-      0.0f, 1.0f, 0.0f, position.y,
-      0.0f, 0.0f, 1.0f, position.z,
-      0.0f, 0.0f, 0.0f, 1.0f
-    };
+    void updateTransformMatrix() {
+      transformMatrix = {
+        1.0f, 0.0f, 0.0f, position.x,
+        0.0f, 1.0f, 0.0f, position.y,
+        0.0f, 0.0f, 1.0f, position.z,
+        0.0f, 0.0f, 0.0f, 1.0f
+      };
 
-    Matrix4f rotationMatrix = {
-      1.0f, 0.0f, 0.0f, 0.0f,
-      0.0f, cos(rotation.x), -sin(rotation.x), 0.0f,
-      0.0f, sin(rotation.x), cos(rotation.x), 0.0f,
-      0.0f, 0.0f, 0.0f, 1.0f
-    };
+      // Order of rotations x, y, z
+      Matrix4f rotationMatrix = {
+        1.0f, 0.0f, 0.0f, 0.0f,
+        0.0f, cos(rotation.x), -sin(rotation.x), 0.0f,
+        0.0f, sin(rotation.x), cos(rotation.x), 0.0f,
+        0.0f, 0.0f, 0.0f, 1.0f
+      };
 
-    rotationMatrix = multiply(rotationMatrix, {
-      cos(rotation.y), 0.0f, sin(rotation.y), 0.0f,
-      0.0f, 1.0f, 0.0f, 0.0f,
-      -sin(rotation.y), 0.0f, cos(rotation.y), 0.0f,
-      0.0f, 0.0f, 0.0f, 1.0f
-    });
+      rotationMatrix = multiply({
+        cos(rotation.y), 0.0f, sin(rotation.y), 0.0f,
+        0.0f, 1.0f, 0.0f, 0.0f,
+        -sin(rotation.y), 0.0f, cos(rotation.y), 0.0f,
+        0.0f, 0.0f, 0.0f, 1.0f
+      }, rotationMatrix);
 
-    rotationMatrix = multiply(rotationMatrix, {
-      cos(rotation.z), -sin(rotation.z), 0.0f, 0.0f,
-      sin(rotation.z), cos(rotation.z), 0.0f, 0.0f,
-      0.0f, 0.0f, 1.0f, 0.0f,
-      0.0f, 0.0f, 0.0f, 1.0f
-    });
+      rotationMatrix = multiply({
+        cos(rotation.z), -sin(rotation.z), 0.0f, 0.0f,
+        sin(rotation.z), cos(rotation.z), 0.0f, 0.0f,
+        0.0f, 0.0f, 1.0f, 0.0f,
+        0.0f, 0.0f, 0.0f, 1.0f
+      }, rotationMatrix);
 
-    transformMatrix = multiply(transformMatrix, rotationMatrix);
-  }
+      transformMatrix = multiply(transformMatrix, rotationMatrix);
+    }
 };
 
 Arduboy2 arduboy;
@@ -82,9 +84,12 @@ Matrix4f projectionMat;
 
 RenderedObject* testObject;
 
+float delta = 0.0f;
+
 void setup() {
   arduboy.begin();
-  arduboy.setFrameRate(50);
+  arduboy.setFrameRate(TARGET_FRAMERATE);
+  delta = 1 / 50.0f;
   setupProjectionMatrix();
 
   //Test
@@ -96,15 +101,41 @@ void loop() {
     return;
   }
 
-  testObject->rotation.y += (30.0f / 50.0f) * DEG_2_RAD;
-  testObject->rotation.x += (45.0f / 50.0f) * DEG_2_RAD;
+  Arduboy2Base::pollButtons();
+
+  int xAxis = 0;
+  int yAxis = 0;
+  int zAxis = 0;
+
+  if (Arduboy2Base::pressed(DOWN_BUTTON)) {
+    xAxis = -1;
+  } else if (Arduboy2Base::pressed(UP_BUTTON)) {
+    xAxis = 1;
+  }
+
+  if (Arduboy2Base::pressed(LEFT_BUTTON)) {
+    yAxis = -1;
+  } else if (Arduboy2Base::pressed(RIGHT_BUTTON)) {
+    yAxis = 1;
+  }
+
+  if (Arduboy2Base::pressed(A_BUTTON)) {
+    zAxis = -1;
+  } else if (Arduboy2Base::pressed(B_BUTTON)) {
+    zAxis = 1;
+  }
+
+  testObject->rotation.x += xAxis * (30.0f * delta) * DEG_2_RAD;
+  testObject->rotation.y += yAxis * (30.0f * delta) * DEG_2_RAD;
+  testObject->rotation.z += zAxis * (30.0f * delta) * DEG_2_RAD;
   testObject->markUpdated();
 
   //Serial.println("Rendering...");
   render();
 }
 
-void printVertex(char msg[], Vector4f vec) {
+/*
+  void printVertex(char msg[], Vector4f vec) {
   Serial.print(msg);
   Serial.print(vec.x);
   Serial.print(", ");
@@ -113,9 +144,9 @@ void printVertex(char msg[], Vector4f vec) {
   Serial.print(vec.z);
   Serial.print(", ");
   Serial.println(vec.w);
-}
+  }
 
-void printMatrix(char msg[], Matrix4f mat) {
+  void printMatrix(char msg[], Matrix4f mat) {
   Serial.print(msg);
   Serial.print(mat.m00);
   Serial.print(", ");
@@ -149,17 +180,18 @@ void printMatrix(char msg[], Matrix4f mat) {
   Serial.print(", ");
   Serial.print(mat.m33);
   Serial.println(", ");
-}
+  }
+*/
 
 void render() {
   arduboy.clear();
-  
+
   testObject->onPreRender();
 
   Matrix4f transformProjMatrix = multiply(projectionMat, testObject->TransformMatrix());
 
   //printMatrix("Matrix: ", transformProjMatrix);
-  
+
   Mesh* mesh = testObject->Mesh();
 
   Vector3f* meshVerts = mesh->vertices;
@@ -168,7 +200,7 @@ void render() {
 
   //Serial.print("Mesh vert length: ");
   //Serial.println(mesh->vertLength);
-  
+
   for (int i = 0; i < mesh->vertLength; i++) {
     Vector4f result = multiply(transformProjMatrix, Vector4f(meshVerts[i]));
     if (result.w == 0.0f) {
@@ -186,12 +218,12 @@ void render() {
     const Vector3f& a = verts[indices[i]];
     const Vector3f& b = verts[indices[i + 1]];
     const Vector3f& c = verts[indices[i + 2]];
-    
+
     arduboy.drawLine(a.x, a.y, b.x, b.y);
     arduboy.drawLine(b.x, b.y, c.x, c.y);
     arduboy.drawLine(c.x, c.y, a.x, a.y);
   }
-  
+
   arduboy.display();
 }
 
