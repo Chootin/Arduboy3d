@@ -38,7 +38,7 @@ const uint8_t pyramidIndices[] = {
   1, 4, 0
 };
 
-const Mesh primativeSquare = {
+const Mesh primitiveSquare = {
   4,
   squareVertices,
 
@@ -46,7 +46,7 @@ const Mesh primativeSquare = {
   squareIndices
 };
 
-const Mesh primativePyramid = {
+const Mesh primitivePyramid = {
   5,
   pyramidVertices,
 

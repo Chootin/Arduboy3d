@@ -93,7 +93,7 @@ void setup() {
   setupProjectionMatrix();
 
   //Test
-  testObject = new RenderedObject({0.0f, -0.5f, 5.0f}, {0.0f, 0.0f, 0.0f}, &primativePyramid);
+  testObject = new RenderedObject({0.0f, -0.5f, 5.0f}, {0.0f, 0.0f, 0.0f}, &primitivePyramid);
 }
 
 void loop() {
