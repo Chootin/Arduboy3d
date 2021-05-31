@@ -8,6 +8,12 @@
 #define DEG_2_RAD 0.01745329f
 #define FOV_RADIANS (60.0f * DEG_2_RAD)
 
+// TODO: to implement shading, I intend to use dithering patterns.
+// These patterns should be definited and referenced in an ordered array.
+// Take in a light level from 0 - 1, then multiply that by the total number of dither patterns.
+// The integer value of that will be the index in the array of the pattern.
+// We can index that array using the screen coordinates of the fragment.
+
 class RenderedObject {
     Mesh* mesh;
     Matrix4f transformMatrix;
