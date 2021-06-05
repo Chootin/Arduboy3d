@@ -15,7 +15,7 @@ Arduboy2 arduboy;
 
 Matrix4f projectionMat;
 
-Vector3f lightVector;
+extern Vector3f lightVector;
 
 RenderedObject* testObject;
 
@@ -29,7 +29,7 @@ void setup() {
   delta = 1 / 50.0f;
   setupProjectionMatrix();
 
-  lightVector = {-120.0f * DEG_2_RAD, -120.0f * DEG_2_RAD, 0.0f};
+  lightVector = {0.0f, -1.0f, 0.0f};
 
   //Test
   testObject = new RenderedObject({0.0f, -0.5f, 5.0f}, {0.0f, 0.0f, 0.0f}, &primitivePyramid);
@@ -41,33 +41,11 @@ void loop() {
     return;
   }
 
-  Arduboy2Base::pollButtons();
+  //Arduboy2Base::pollButtons();
 
-  int xAxis = 0;
-  int yAxis = 0;
-  int zAxis = 0;
-
-  if (Arduboy2Base::pressed(DOWN_BUTTON)) {
-    xAxis = -1;
-  } else if (Arduboy2Base::pressed(UP_BUTTON)) {
-    xAxis = 1;
-  }
-
-  if (Arduboy2Base::pressed(LEFT_BUTTON)) {
-    yAxis = -1;
-  } else if (Arduboy2Base::pressed(RIGHT_BUTTON)) {
-    yAxis = 1;
-  }
-
-  if (Arduboy2Base::pressed(A_BUTTON)) {
-    zAxis = -1;
-  } else if (Arduboy2Base::pressed(B_BUTTON)) {
-    zAxis = 1;
-  }
-
-  testObject->rotation.x += xAxis * (60.0f * delta) * DEG_2_RAD;
-  testObject->rotation.y += yAxis * (60.0f * delta) * DEG_2_RAD;
-  testObject->rotation.z += zAxis * (60.0f * delta) * DEG_2_RAD;
+  testObject->rotation.x += (60.0f * delta) * DEG_2_RAD;
+  testObject->rotation.y += (90.0f * delta) * DEG_2_RAD;
+  testObject->rotation.z += (10.0f * delta) * DEG_2_RAD;
   testObject->markUpdated();
 
   if (justRenderedFlag) {

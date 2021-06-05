@@ -4,25 +4,33 @@
 struct Dither {
   int width;
   int height;
-  bool pattern[];
+  bool* pattern;
 };
 
-Dither ditherPatterns[] = {
-  {1, 1,
-  {
-    0
-  }},
-  
-  {2, 2,
-  {
-    0, 1,
-    1, 0
-  }},
-  
-  {1, 1,
-  {
-    1
-  }}
+#define NUM_DITHER_PATTERNS 3
+
+Vector3f lightVector;
+
+const bool dark[] = {
+  0, 0, 0, 1,
+  0, 0, 0, 0,
+  0, 0, 0, 0,
+  0, 0, 0, 0
+};
+
+const bool medium[] = {
+  0, 1,
+  1, 0
+};
+
+const bool light[] = {
+  1
+};
+
+const Dither ditherPatterns[] = {
+  {4, 4, dark},
+  {2, 2, medium},
+  {1, 1, light}
 };
 
 // TODO: to implement shading, I intend to use dithering patterns.
@@ -42,8 +50,6 @@ void renderDithered(const Arduboy2& arduboy, const Matrix4f& projectionMat, Rend
 
   Vector3f world[mesh->vertLength];
   Vector3f projected[mesh->vertLength];
-
-  float intensities[mesh->indicesLength / 3];
 
   for (int i = 0; i < mesh->vertLength; i++) {
     world[i] = multiply(renderedObject->TransformMatrix(), Vector4f(meshVerts[i]));
@@ -67,6 +73,19 @@ void renderDithered(const Arduboy2& arduboy, const Matrix4f& projectionMat, Rend
     const Vector3f& vec1 = subtract(world[i2], world[i1]);
 
     const Vector3f& cross = crossProduct(vec0, vec1);
+    float mag = magnitude(cross);
+    const Vector3f& normal = {cross.x / mag, cross.y / mag, cross.z / mag};
+
+    float dot = dotProduct(normal, lightVector);
+    float lightAngle = acos(dot); // Assuming lightVector has magnitude of 1
+    float intensity = (PI - lightAngle) / PI;
+    
+    int ditherIndex = (int) (intensity * NUM_DITHER_PATTERNS);
+    if (ditherIndex >= NUM_DITHER_PATTERNS) {
+      ditherIndex = NUM_DITHER_PATTERNS - 1;
+    }
+
+    Dither* dither = &ditherPatterns[ditherIndex];
     
     const Vector3f& a = projected[i0];
     const Vector3f& b = projected[i1];
@@ -81,7 +100,11 @@ void renderDithered(const Arduboy2& arduboy, const Matrix4f& projectionMat, Rend
     for (int y = triangle.minY; y <= triangle.maxY; y++) {
       for (int x = triangle.minX; x <= triangle.maxX; x++) {
         if (line0.evaluate(x, y) >= 0 && line1.evaluate(x, y) >= 0 && line2.evaluate(x, y) >= 0) {
-          arduboy.drawPixel(x, y);
+          int patternIndex = (y % dither->height) * dither->width + (x % dither->width);
+
+          if (dither->pattern[patternIndex]) {
+            arduboy.drawPixel(x, y);
+          }
         }
       }
     }

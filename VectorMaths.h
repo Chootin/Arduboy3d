@@ -127,11 +127,20 @@ Matrix4f multiply(const Matrix4f& a, const Matrix4f& b) {
 }
 
 Vector3f crossProduct(const Vector3f& vec0, const Vector3f& vec1) {
-  //TODO:
+  return {
+    vec0.y * vec1.z - vec1.y * vec0.z,
+    vec0.z * vec1.x - vec1.z * vec0.x,
+    vec0.x * vec1.y - vec1.x * vec0.y
+  };
 }
 
-int dotProduct(const Vector3f& vec0, const Vector3f& vec1) {
+float dotProduct(const Vector3f& vec0, const Vector3f& vec1) {
   return vec0.x * vec1.x + vec0.y * vec1.y + vec0.z * vec1.z;
+}
+
+// TODO: Fast Approx Sqrt...
+float magnitude(const Vector3f& vec) {
+  return sqrt(vec.x * vec.x + vec.y * vec.y + vec.z * vec.z);
 }
 
 Vector3f subtract(const Vector3f& from, const Vector3f& value) {
