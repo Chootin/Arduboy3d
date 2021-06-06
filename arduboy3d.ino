@@ -32,7 +32,7 @@ void setup() {
   lightVector = {0.0f, -1.0f, 0.0f};
 
   //Test
-  testObject = new RenderedObject({0.0f, -0.5f, 5.0f}, {0.0f, 0.0f, 0.0f}, &primitivePyramid);
+  testObject = new RenderedObject({0.0f, 0.0f, 5.0f}, {0.0f, 0.0f, 0.0f}, &primitiveCube);
 }
 
 void loop() {
@@ -43,9 +43,9 @@ void loop() {
 
   //Arduboy2Base::pollButtons();
 
-  testObject->rotation.x += (60.0f * delta) * DEG_2_RAD;
-  testObject->rotation.y += (90.0f * delta) * DEG_2_RAD;
-  testObject->rotation.z += (10.0f * delta) * DEG_2_RAD;
+  testObject->rotation.x += (120.0f * delta) * DEG_2_RAD;
+  testObject->rotation.y += (180.0f * delta) * DEG_2_RAD;
+  testObject->rotation.z += (20.0f * delta) * DEG_2_RAD;
   testObject->markUpdated();
 
   if (justRenderedFlag) {

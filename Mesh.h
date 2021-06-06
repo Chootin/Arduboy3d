@@ -26,7 +26,7 @@ const Vector3f pyramidVertices[] = {
   {0.5f, 0, -0.5f},
   {0.5f, 0, 0.5f},
   {-0.5f, 0, 0.5f},
-  {0, 1.0f, 0},
+  {0, 1.0f, 0}
 };
 
 const uint8_t pyramidIndices[] = {
@@ -36,6 +36,32 @@ const uint8_t pyramidIndices[] = {
   1, 2, 4,
   2, 3, 4,
   3, 0, 4
+};
+
+const Vector3f cubeVertices[] = {
+  {0.5f, 0.5f, -0.5f},
+  {0.5f, -0.5f, -0.5f},
+  {0.5f, 0.5f, 0.5f},
+  {0.5f, -0.5f, 0.5f},
+  {-0.5f, 0.5f, -0.5f},
+  {-0.5f, -0.5f, -0.5f},
+  {-0.5f, 0.5f, 0.5f},
+  {-0.5f, -0.5f, 0.5f}
+};
+
+const uint8_t cubeIndices[] = {
+  4, 0, 2,
+  2, 3, 7,
+  6, 7, 5,
+  1, 5, 7,
+  0, 1, 3,
+  4, 5, 1,
+  4, 2, 6,
+  2, 7, 6,
+  6, 5, 4,
+  1, 7, 3,
+  0, 3, 2,
+  4, 1, 0
 };
 
 const Mesh primitiveSquare = {
@@ -52,6 +78,14 @@ const Mesh primitivePyramid = {
 
   18,
   pyramidIndices
+};
+
+const Mesh primitiveCube = {
+  8,
+  cubeVertices,
+
+  36,
+  cubeIndices
 };
 
 #endif

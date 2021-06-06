@@ -7,20 +7,25 @@ struct Dither {
   bool* pattern;
 };
 
-#define NUM_DITHER_PATTERNS 3
+#define NUM_DITHER_PATTERNS 4
 
 Vector3f lightVector;
 
 const bool dark[] = {
   0, 0, 0, 1,
   0, 0, 0, 0,
-  0, 0, 0, 0,
+  0, 1, 0, 0,
   0, 0, 0, 0
 };
 
 const bool medium[] = {
   0, 1,
   1, 0
+};
+
+const bool brighter[] {
+  1, 1,
+  0, 1
 };
 
 const bool light[] = {
@@ -30,6 +35,7 @@ const bool light[] = {
 const Dither ditherPatterns[] = {
   {4, 4, dark},
   {2, 2, medium},
+  {2, 2, brighter},
   {1, 1, light}
 };
 
@@ -65,9 +71,9 @@ void renderDithered(const Arduboy2& arduboy, const Matrix4f& projectionMat, Rend
 
   uint8_t* indices = mesh->indices;
   for (int i = 0; i < mesh->indicesLength; i += 3) {
-    int i0 = indices[i];
-    int i1 = indices[i + 1];
-    int i2 = indices[i + 2];
+    uint8_t i0 = indices[i];
+    uint8_t i1 = indices[i + 1];
+    uint8_t i2 = indices[i + 2];
     
     const Vector3f& vec0 = subtract(world[i1], world[i0]);
     const Vector3f& vec1 = subtract(world[i2], world[i1]);
