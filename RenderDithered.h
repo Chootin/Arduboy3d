@@ -7,15 +7,20 @@ struct Dither {
   bool* pattern;
 };
 
-#define NUM_DITHER_PATTERNS 4
+#define NUM_DITHER_PATTERNS 6
 
 Vector3f lightVector;
 
-const bool dark[] = {
+const bool darker[] = {
   0, 0, 0, 1,
   0, 0, 0, 0,
   0, 1, 0, 0,
   0, 0, 0, 0
+};
+
+const bool dark[] = {
+  0, 1,
+  0, 0
 };
 
 const bool medium[] = {
@@ -23,9 +28,16 @@ const bool medium[] = {
   1, 0
 };
 
+const bool bright[] {
+  1, 0,
+  1, 1
+};
+
 const bool brighter[] {
-  1, 1,
-  0, 1
+  1, 1, 1, 0,
+  1, 1, 1, 1,
+  1, 0, 1, 1,
+  1, 1, 1, 1
 };
 
 const bool light[] = {
@@ -33,16 +45,18 @@ const bool light[] = {
 };
 
 const Dither ditherPatterns[] = {
-  {4, 4, dark},
+  {4, 4, darker},
+  {2, 2, dark},
   {2, 2, medium},
-  {2, 2, brighter},
+  {2, 2, bright},
+  {4, 4, brighter},
   {1, 1, light}
 };
 
-// TODO: to implement shading, I intend to use dithering patterns.
-// These patterns should be definited and referenced in an ordered array.
+// To implement shading, I am using dithering patterns.
+// These patterns are definited and referenced in an ordered array.
 // Take in a light level from 0 - 1, then multiply that by the total number of dither patterns.
-// The integer value of that will be the index in the array of the pattern.
+// The integer value of that is the index in the array of the pattern.
 // We can index that array using the screen coordinates of the fragment.
 
 void renderDithered(const Arduboy2& arduboy, const Matrix4f& projectionMat, RenderedObject* renderedObject) {
@@ -52,13 +66,19 @@ void renderDithered(const Arduboy2& arduboy, const Matrix4f& projectionMat, Rend
 
   Mesh* mesh = renderedObject->Mesh();
 
-  Vector3f* meshVerts = mesh->vertices;
+  float* meshVerts = mesh->vertices;
 
-  Vector3f world[mesh->vertLength];
-  Vector3f projected[mesh->vertLength];
+  uint16_t numVerts = mesh->vertLength / 3;
+  Vector3f world[numVerts];
+  Vector3f projected[numVerts];
 
-  for (int i = 0; i < mesh->vertLength; i++) {
-    world[i] = multiply(renderedObject->TransformMatrix(), Vector4f(meshVerts[i]));
+  for (int i = 0, vI = 0; i < numVerts; i++) {
+    vI = i * 3;
+    const float vx = pgm_read_float_near(meshVerts + vI);
+    const float vy = pgm_read_float_near(meshVerts + vI + 1);
+    const float vz = pgm_read_float_near(meshVerts + vI + 2);
+    
+    world[i] = multiply(renderedObject->TransformMatrix(), Vector4f(vx, vy, vz, 1.0f));
     Vector4f result = multiply(projectionMat, world[i]);
     
     if (result.w == 0.0f) {
@@ -71,9 +91,9 @@ void renderDithered(const Arduboy2& arduboy, const Matrix4f& projectionMat, Rend
 
   uint8_t* indices = mesh->indices;
   for (int i = 0; i < mesh->indicesLength; i += 3) {
-    uint8_t i0 = indices[i];
-    uint8_t i1 = indices[i + 1];
-    uint8_t i2 = indices[i + 2];
+    const uint8_t i0 = pgm_read_byte_near(indices + i);
+    const uint8_t i1 = pgm_read_byte_near(indices + i + 1);
+    const uint8_t i2 = pgm_read_byte_near(indices + i + 2);
     
     const Vector3f& vec0 = subtract(world[i1], world[i0]);
     const Vector3f& vec1 = subtract(world[i2], world[i1]);

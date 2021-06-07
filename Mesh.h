@@ -2,34 +2,34 @@
 #define _MESH_H_
 
 struct Mesh {
-  uint8_t vertLength;
-  Vector3f* vertices;
+  uint16_t vertLength;
+  float* vertices;
   
-  uint8_t indicesLength;
+  uint16_t indicesLength;
   uint8_t* indices;
 };
 
-const Vector3f squareVertices[] = {
-  {-0.5f, -0.5f, 0.0f},
-  {0.5f, -0.5f, 0.0f},
-  {0.5f, 0.5f, 0.0f},
-  {-0.5f, 0.5f, 0.0f}
+const float squareVertices[] PROGMEM = {
+  -0.5f, -0.5f, 0.0f,
+  0.5f, -0.5f, 0.0f,
+  0.5f, 0.5f, 0.0f,
+  -0.5f, 0.5f, 0.0f
 };
 
-const uint8_t squareIndices[] = {
+const uint8_t squareIndices[] PROGMEM = {
   0, 1, 2,
   0, 2, 3
 };
 
-const Vector3f pyramidVertices[] = {
-  {-0.5f, 0, -0.5f},
-  {0.5f, 0, -0.5f},
-  {0.5f, 0, 0.5f},
-  {-0.5f, 0, 0.5f},
-  {0, 1.0f, 0}
+const float pyramidVertices[] PROGMEM = {
+  -0.5f, 0, -0.5f,
+  0.5f, 0, -0.5f,
+  0.5f, 0, 0.5f,
+  -0.5f, 0, 0.5f,
+  0, 1.0f, 0
 };
 
-const uint8_t pyramidIndices[] = {
+const uint8_t pyramidIndices[] PROGMEM = {
   0, 2, 1,
   0, 3, 2,
   0, 1, 4,
@@ -38,18 +38,18 @@ const uint8_t pyramidIndices[] = {
   3, 0, 4
 };
 
-const Vector3f cubeVertices[] = {
-  {0.5f, 0.5f, -0.5f},
-  {0.5f, -0.5f, -0.5f},
-  {0.5f, 0.5f, 0.5f},
-  {0.5f, -0.5f, 0.5f},
-  {-0.5f, 0.5f, -0.5f},
-  {-0.5f, -0.5f, -0.5f},
-  {-0.5f, 0.5f, 0.5f},
-  {-0.5f, -0.5f, 0.5f}
+const float cubeVertices[] PROGMEM = {
+  0.5f, 0.5f, -0.5f,
+  0.5f, -0.5f, -0.5f,
+  0.5f, 0.5f, 0.5f,
+  0.5f, -0.5f, 0.5f,
+  -0.5f, 0.5f, -0.5f,
+  -0.5f, -0.5f, -0.5f,
+  -0.5f, 0.5f, 0.5f,
+  -0.5f, -0.5f, 0.5f
 };
 
-const uint8_t cubeIndices[] = {
+const uint8_t cubeIndices[] PROGMEM = {
   4, 0, 2,
   2, 3, 7,
   6, 7, 5,
@@ -65,27 +65,18 @@ const uint8_t cubeIndices[] = {
 };
 
 const Mesh primitiveSquare = {
-  4,
-  squareVertices,
-
-  6,
-  squareIndices
+  12, squareVertices,
+  6, squareIndices
 };
 
 const Mesh primitivePyramid = {
-  5,
-  pyramidVertices,
-
-  18,
-  pyramidIndices
+  15, pyramidVertices,
+  18, pyramidIndices
 };
 
 const Mesh primitiveCube = {
-  8,
-  cubeVertices,
-
-  36,
-  cubeIndices
+  24, cubeVertices,
+  36, cubeIndices
 };
 
 #endif
