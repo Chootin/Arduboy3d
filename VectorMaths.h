@@ -138,9 +138,25 @@ float dotProduct(const Vector3f& vec0, const Vector3f& vec1) {
   return vec0.x * vec1.x + vec0.y * vec1.y + vec0.z * vec1.z;
 }
 
-// TODO: Fast Approx Sqrt...
+float Q_rsqrt( float number )
+{
+  long i;
+  float x2, y;
+  const float threehalfs = 1.5F;
+
+  x2 = number * 0.5F;
+  y  = number;
+  i  = * ( long * ) &y;                       // evil floating point bit level hacking
+  i  = 0x5f3759df - ( i >> 1 );               // what the fuck? 
+  y  = * ( float * ) &i;
+  y  = y * ( threehalfs - ( x2 * y * y ) );   // 1st iteration
+//  y  = y * ( threehalfs - ( x2 * y * y ) );   // 2nd iteration, this can be removed
+
+  return y;
+}
+
 float magnitude(const Vector3f& vec) {
-  return sqrt(vec.x * vec.x + vec.y * vec.y + vec.z * vec.z);
+  return Q_rsqrt(vec.x * vec.x + vec.y * vec.y + vec.z * vec.z);
 }
 
 Vector3f subtract(const Vector3f& from, const Vector3f& value) {
