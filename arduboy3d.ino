@@ -23,6 +23,8 @@ float delta = 0.0f;
 
 bool justRenderedFlag = false;
 
+int numSkips = 0;
+
 void setup() {
   arduboy.begin();
   arduboy.setFrameRate(TARGET_FRAMERATE);
@@ -37,7 +39,7 @@ void setup() {
 
 void loop() {
   if (!arduboy.nextFrame()) {
-    justRenderedFlag = false;
+    numSkips++;
     return;
   }
 
@@ -48,13 +50,12 @@ void loop() {
   testObject->rotation.z += (20.0f * delta) * DEG_2_RAD;
   testObject->markUpdated();
 
-  if (justRenderedFlag) {
-    Serial.println("May not be hitting the target framerate!");
-  }
+  Serial.print("Num skips between renders: ");
+  Serial.println(numSkips);
   
   render();
-  
-  justRenderedFlag = true;
+
+  numSkips = 0;
 }
 
 void render() {

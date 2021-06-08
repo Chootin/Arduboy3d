@@ -3,8 +3,7 @@
 import sys
 import re
 
-#vertexFormat = "{{{x}, {y}, {z}}}"
-vertexFormat = "{x}, {y}, {z}"
+vertexFormat = "{x:.4}f, {y:.4}f, {z:.4}f"
 
 vertices = []
 indices = []
@@ -23,8 +22,8 @@ def AddIndices(line):
     indicesRe = re.search("^f (\d+) (\d+) (\d+)", line)
     if indicesRe:
         indices.append(int(indicesRe[1]) - 1)
-        indices.append(int(indicesRe[2]) - 1)
         indices.append(int(indicesRe[3]) - 1)
+        indices.append(int(indicesRe[2]) - 1)
         
 
 def SaveFile(inFileName):
